@@ -1,4 +1,4 @@
-name: Deploy React App
+name: Deploy
 
 on:
   push:
@@ -7,39 +7,45 @@ on:
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Setup Node
+        uses: actions/setup-node@v2
         with:
-          node-version: "16" # or your preferred version
+          node-version: "18"
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build
+      - name: Build project
         run: npm run build
 
       - name: Upload production-ready build files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
-          name: react-app
-          path: build/
+          name: production-files
+          path: ./build # Ensure this matches the output directory
 
   deploy:
-    runs-on: ubuntu-latest
+    name: Deploy
     needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
     steps:
-      - name: Download production-ready build files
-        uses: actions/download-artifact@v3
+      - name: Download artifact
+        uses: actions/download-artifact@v2
         with:
-          name: react-app
+          name: production-files
+          path: ./build # Ensure this matches the directory you upload from
 
-      - name: Deploy
-        run: |
-          # Deployment script or commands here
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build # Ensure this matches the directory you download to
