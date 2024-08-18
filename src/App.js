@@ -12,7 +12,7 @@ function App() {
   return (
     <div className="App">
       <header>
-        <h1>Live Chat</h1>
+        <h1>📱 Live Chat</h1>
         <SignOut />
       </header>
       <section> 
